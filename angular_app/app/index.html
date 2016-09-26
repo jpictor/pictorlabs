@@ -45,13 +45,11 @@
             <a class="navbar-brand" href="app/">Pictor Labs</a>
         </div>
 
-        <div ng-cloak ng-if="userIsAuthenticated" class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-            <ul class="nav navbar-nav">
-
+        <div ng-cloak class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
             <ul class="nav navbar-nav navbar-right">
-                <li><a href="/app/" ng-click="logout()">Sign Out</a></li>
+                <li ng-if="!userIsAuthenticated"><a href="/app/login">Sign In</a></li>
+                <li ng-if="userIsAuthenticated"><a href="/app/" ng-click="logout()">Sign Out</a></li>
             </ul>
-
         </div>
 
     </div>
