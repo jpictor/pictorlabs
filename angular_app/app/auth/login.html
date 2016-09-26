@@ -1,0 +1,13 @@
+<form ng-if="!userIsAuthenticated" ng-submit="submit()" ng-controller="LoginCtrl" class="form-signin">
+    <h2 class="form-signin-heading">Sign in</h2>
+
+    <div ng-show="serverDown" class="alert alert-danger" role="alert">The server is down right now.  Try again later.</div>
+    <div ng-show="incorrectPassword" class="alert alert-warning" role="alert">Incorrect user name or password.  Try again.</div>
+
+    <label for="inputUsername" class="sr-only">Username</label>
+    <input type="text" id="inputUsername" ng-model="inputUsername" class="form-control" placeholder="Username" required autofocus>
+    <label for="inputPassword" class="sr-only">Password</label>
+    <input type="password" id="inputPassword" ng-model="inputPassword" class="form-control" placeholder="Password" required>
+
+    <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
+</form>

@@ -1,0 +1,38 @@
+<div class="container-fluid">
+    <div class="row">
+        <div class="main col-md-12">
+
+            <div class="col-md-12 col-sm-12"><h4 class="page-header">{{entity.title || 'Videos'}}<span class="pull-right">{{totalItemCount}} items</span></h4></div>
+
+                <div class="col-md-2 col-sm-4" ng-repeat="i in items">
+                    <div class="panel panel-default" style="height:450px;overflow:hidden" ng-click="setParentEntity(i.id)">
+                        <img ng-if="i.type == 'image'" style="width:100%;max-height:200px" class="img-responsive" ng-src="{{i.url}}">
+                        <img ng-if="i.type == 'video'" style="width:100%;max-height:200px" class="img-responsive" ng-src="{{i.image_url}}">
+                        <div class="panel-body">
+                            <div class="row">
+                                <div class="col-md-12 h4">{{i.title}}</div>
+                                <div ng-if="i.type == 'video'" ng-if="i.type == 'video'" class="col-md-12">Video</div>
+                                <div ng-if="i.type == 'video'" class="col-md-12"><span am-time-ago="i.created"></span></div>
+                                <div ng-if="i.type == 'image'" class="col-md-12">
+                                    <div ng-if="i.doc.bvlc_googlenet">
+                                        <h5>Label / Probability</h5>
+                                        <div ng-repeat="label in i.doc.bvlc_googlenet">
+                                            <small>{{label[1]}} {{label[0]|number:2}}</small>
+                                        </div>
+                                    </div>
+                                    <div ng-if="i.doc.faces">
+                                        <h5>Faces</h5>
+                                        <div ng-repeat="label in i.doc.faces">
+                                            <small>x={{label[0]}} y={{label[1]}} w={{label[2]}} h={{label[3]}}</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+        </div>
+    </div>
+    <div infinite-scroll="loadItems(false)" infinite-scroll-distance="1"></div>
+</div>

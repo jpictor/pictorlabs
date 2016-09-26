@@ -1,0 +1,10 @@
+*.pyc
+*.*~
+\#*\#
+.*
+!.gitignore
+!.coveragerc
+!.pylintrc
+!.pep8
+vpython
+static

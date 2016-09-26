@@ -1,0 +1,22 @@
+{% extends "rest_framework/base.html" %}
+{% load rest_framework %}
+
+{% block title %}Pictor Labs Service{% endblock %}
+
+{% block branding %}
+<div class="brand">
+  <a class='navbar-brand' rel="nofollow" href='/'>
+      Pictor Labs Service <span class="version">{{SERVICE_VERSION}}</span>
+  </a>
+</div>
+{% endblock %}
+
+{% block userlinks %}
+    <li><a href="/">Home</a></li>
+    {% if user.is_authenticated %}
+        <li><a href="/admin/">Administration</a></li>
+        {% optional_logout request user %}
+    {% else %}
+        {% optional_login request %}
+    {% endif %}
+{% endblock %}

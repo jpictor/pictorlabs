@@ -1,0 +1,14 @@
+node_modules
+app/bower_components
+dist
+*debug.log
+.sass-cache
+doc
+lib
+!app/lib
+test-results.xml
+.idea
+*.orig
+*~
+.DS_Store
+obj

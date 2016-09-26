@@ -1,0 +1,91 @@
+server {
+    listen 8192;
+    client_max_body_size 50M;
+
+    location /app/ {
+        alias /opt/pictorlabs/angular_app/app/;
+        try_files $uri /app/index.html;
+    }
+    location /static/ {
+        alias /opt/pictorlabs/static/;
+    }
+    location /images/ {
+        alias /disk/d0/data/images/;
+    }
+    location /entities/ {
+        alias /disk/d0/data/entities/;
+    }
+
+    location / {
+        proxy_pass http://localhost:9193;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header Upgrade $http_upgrade; # allow websockets
+        proxy_set_header Connection "upgrade";
+        proxy_set_header X-Forwarded-For $remote_addr; # preserve client IP
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header X-Forwarded-Host $host;
+        proxy_set_header HTTP_IS_INTERNAL "0";
+        add_header Cache-Control no-cache;
+        proxy_read_timeout 86400;
+        # this setting allows the browser to cache the application in a way compatible with Meteor
+        # on every applicaiton update the name of CSS and JS file is different, so they can be cache infinitely (here: 30 days)
+        # the root path (/) MUST NOT be cached
+        if ($uri != '/') {
+            expires 30d;
+        }
+    }
+
+    location /private/ {
+        lua_need_request_body on;
+        set $proxy_to_server '';
+        access_by_lua '
+            local res = ngx.location.capture("/api/session/check", {method=ngx.HTTP_GET, args = {host=ngx.var.host}})
+            if res.status == ngx.HTTP_OK then
+                return
+            end
+            if res.status == ngx.HTTP_FORBIDDEN then
+                 -- local port = ngx.var.http_host:match(":(%d+)$")
+                 local redirect_to = ngx.var.scheme .. "://" .. ngx.var.host .. "/app/login?next=" .. ngx.escape_uri(ngx.var.request_uri)
+                 ngx.redirect(redirect_to)
+            end
+            ngx.exit(ngx.HTTP_SERVICE_UNAVAILABLE)
+        ';
+        alias /disk/d0/data/private/;
+    }
+
+    location /ipython/ {
+        lua_need_request_body on;
+        set $proxy_to_server '';
+        access_by_lua '
+            local res = ngx.location.capture("/api/session/check", {method=ngx.HTTP_GET, args = {host=ngx.var.host}})
+            if res.status == ngx.HTTP_OK then
+                return
+            end
+            if res.status == ngx.HTTP_FORBIDDEN then
+                 -- local port = ngx.var.http_host:match(":(%d+)$")
+                 local redirect_to = ngx.var.scheme .. "://" .. ngx.var.host .. "/app/login?next=" .. ngx.escape_uri(ngx.var.request_uri)
+                 ngx.redirect(redirect_to)
+            end
+            ngx.exit(ngx.HTTP_SERVICE_UNAVAILABLE)
+        ';
+        proxy_pass http://localhost:8888;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header Upgrade $http_upgrade; # allow websockets
+        proxy_set_header Connection "upgrade";
+        proxy_set_header X-Forwarded-For $remote_addr; # preserve client IP
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header X-Forwarded-Host $host;
+	add_header Cache-Control no-cache;
+	proxy_read_timeout 86400;
+        # this setting allows the browser to cache the application in a way compatible with Meteor
+        # on every applicaiton update the name of CSS and JS file is different, so they can be cache infinitely (here: 30 days)
+        # the root path (/) MUST NOT be cached
+        if ($uri != '/') {
+            expires 30d;
+        }
+    }
+}

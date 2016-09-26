@@ -1,0 +1,17 @@
+## general settings
+debug: true
+log_level: info
+log_json: false
+time_zone: UTC
+
+## SQL database
+dbengine: django.db.backends.postgresql_psycopg2
+dbhost: 127.0.0.1
+dbuser: postgres
+dbpass: password
+dbname: pictorlabs
+testdbname: pictorlabs_test
+
+## RabbitMQ settings for Celery
+celery_broker_url: amqp://pictorlabs_user:password@localhost:5672/pictorlabs_vhost
+celery_broker_url_test: amqp://pictorlabs_testuser:password@localhost:5672/pictorlabs_testvhost
