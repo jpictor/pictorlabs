@@ -105,8 +105,8 @@ case "$1" in
             --workdir=${SERVICE_ROOT}/var \
             --maxtasksperchild=10 \
             --loglevel=INFO \
-            --schedule=${SERVICE_ROOT}/celerybeat.db \
-	    --pidfile=${SERVICE_ROOT}/celerybeat.pid
+            --schedule=${SERVICE_ROOT}/var/celerybeat.db \
+	    --pidfile=${SERVICE_ROOT}/var/celerybeat.pid
 	;;
     celery_q_default)
         exec celery \

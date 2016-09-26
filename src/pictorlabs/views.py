@@ -52,18 +52,6 @@ class EntityViewSet(ModelViewSet):
                 entity=entity, feature=feature, weight=weight)
         return Response(status=status.HTTP_200_OK)
 
-    @detail_route(methods=['post'], url_path='set-newspaper')
-    def set_newspaper(self, request, pk=None):
-        entity = self.get_object()
-        entity.entity_features.filter(feature__feature_set__type='newspaper').delete()
-        data = JSONParser().parse(request)
-        feature_set, created = FeatureSpace.objects.get_or_create(type='newspaper')
-        for weight, item_guid in data:
-            feature, created = Feature.objects.get_or_create(feature_set=feature_set, feature=item_guid)
-            entity_feature, created = EntityFeature.objects.get_or_create(
-                entity=entity, feature=feature, weight=weight)
-        return Response(status=status.HTTP_200_OK)
-
     def set_entity_document(self, doc_type, request):
         data = JSONParser().parse(request)
         entity = self.get_object()
