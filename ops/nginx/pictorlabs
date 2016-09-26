@@ -40,36 +40,36 @@ server {
     location /private/ {
         lua_need_request_body on;
         set $proxy_to_server '';
-        access_by_lua '
+        access_by_lua_block {
             local res = ngx.location.capture("/api/session/check", {method=ngx.HTTP_GET, args = {host=ngx.var.host}})
             if res.status == ngx.HTTP_OK then
                 return
             end
-            if res.status == ngx.HTTP_FORBIDDEN then
+            if res.status == ngx.HTTP_UNAUTHORIZED then
                  -- local port = ngx.var.http_host:match(":(%d+)$")
                  local redirect_to = ngx.var.scheme .. "://" .. ngx.var.host .. "/app/login?next=" .. ngx.escape_uri(ngx.var.request_uri)
                  ngx.redirect(redirect_to)
             end
             ngx.exit(ngx.HTTP_SERVICE_UNAVAILABLE)
-        ';
+        }
         alias /disk/d0/data/private/;
     }
 
     location /ipython/ {
         lua_need_request_body on;
         set $proxy_to_server '';
-        access_by_lua '
+        access_by_lua_block {
             local res = ngx.location.capture("/api/session/check", {method=ngx.HTTP_GET, args = {host=ngx.var.host}})
             if res.status == ngx.HTTP_OK then
                 return
             end
-            if res.status == ngx.HTTP_FORBIDDEN then
+            if res.status == ngx.HTTP_UNAUTHORIZED then
                  -- local port = ngx.var.http_host:match(":(%d+)$")
                  local redirect_to = ngx.var.scheme .. "://" .. ngx.var.host .. "/app/login?next=" .. ngx.escape_uri(ngx.var.request_uri)
                  ngx.redirect(redirect_to)
             end
             ngx.exit(ngx.HTTP_SERVICE_UNAVAILABLE)
-        ';
+        }
         proxy_pass http://localhost:8888;
         proxy_http_version 1.1;
         proxy_set_header Host $host;
