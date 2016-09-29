@@ -14,11 +14,7 @@ from django.core.management.base import BaseCommand
 from pictorlabs.models import Entity
 from pytube import YouTube
 from baseapp.run_ext import run_with_io_timeout
-
-
-caffe.set_device(0)
-caffe.set_mode_gpu()
-#caffe.set_mode_cpu()
+from baseapp.celery_ext import app
 
 
 bvlc_reference_caffenet_model = (
@@ -27,6 +23,7 @@ bvlc_reference_caffenet_model = (
     227, 227,
     'python/caffe/imagenet/ilsvrc_2012_mean.npy',
     'data/ilsvrc12/synset_words.txt')
+
 
 bvlc_googlenet_model = (
     'models/bvlc_googlenet/deploy.prototxt',
@@ -52,8 +49,12 @@ class ImageModel(object):
         self.height = height
         self.imagenet_mean_path = os.path.join(settings.CAFFE_ROOT, mean_image_path)
         self.labels_path = os.path.join(settings.CAFFE_ROOT, labels_path)
-        self.text_labels = np.loadtxt(self.labels_path, str, delimiter='\t')
 
+        caffe.set_device(0)
+        caffe.set_mode_gpu()
+        #caffe.set_mode_cpu()
+
+        self.text_labels = np.loadtxt(self.labels_path, str, delimiter='\t')
         self.net = caffe.Net(self.deploy_prototext_path, self.caffemodel_path, caffe.TEST)
 
         # load input and configure preprocessing
@@ -111,7 +112,7 @@ class ProcessVideoMgr(BaseCommand):
         self.url = url
         self.entity, created = Entity.objects.get_or_create(url=self.url, parent__isnull=True)
 
-    def run_get_youtube_video(self):
+    def run_get_youtube_video_info(self):
         oembed = requests.get('https://youtube.com/oembed', params={'url': self.url})
         doc = oembed.json()
         self.entity.type = 'video'
@@ -120,6 +121,7 @@ class ProcessVideoMgr(BaseCommand):
         self.entity.title = doc['title'] if doc['title'] else None
         self.entity.save()
 
+    def run_download_video(self):
         yt = YouTube(self.url)
         self.entity.make_storage_root()
 
@@ -196,4 +198,14 @@ class ProcessVideoMgr(BaseCommand):
                 image_entity.save()
             else:
                 image_entity.delete()
+
+
+@app.task(name='pictorlabs.add_video')
+def add_video_task(url):
+    mgr = ProcessVideoMgr(url)
+    mgr.run_get_youtube_video_info()    
+    mgr.run_download_video()
+    mgr.run_video_to_images()
+    mgr.run_tag_video()
+
 

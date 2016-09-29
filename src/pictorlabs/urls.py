@@ -6,7 +6,7 @@ router = routers.SimpleRouter()
 router.register(r'entity', views.EntityViewSet, base_name='entity')
 
 urlpatterns = [
-    #url(r'view_counts/(?P<interval>\w+)[/]?$', views.HistogramViewCount.as_view()),
+    url(r'add_video[/]?$', views.add_video),
 ]
 
 urlpatterns += router.urls

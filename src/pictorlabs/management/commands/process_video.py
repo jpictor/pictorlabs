@@ -9,7 +9,7 @@ from cStringIO import StringIO
 from django.conf import settings
 from django.core.management.base import BaseCommand
 from pictorlabs.models import Entity
-from pictorlabs.tasks import ProcessVideoMgr
+from pictorlabs.tasks import ProcessVideoMgr, add_video_task
 
 
 class Command(BaseCommand):
@@ -18,8 +18,5 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         video_url = options['video_url']
-        mgr = ProcessVideoMgr(video_url)
-        mgr.run_get_youtube_video()
-        mgr.run_video_to_images()
-        mgr.run_tag_video()
+        add_video_task(video_url)
 

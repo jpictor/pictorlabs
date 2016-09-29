@@ -1,17 +1,17 @@
 
 import pytz
 from datetime import datetime, timedelta
+import ujson as json
+from django.http.response import HttpResponse
+from rest_framework import status, filters
+from rest_framework.decorators import api_view
 from rest_framework.parsers import JSONParser
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 from rest_framework.decorators import detail_route
 from rest_framework.response import Response
-from django.http.response import HttpResponse
-from rest_framework import status
-from rest_framework import filters
 from rest_framework.pagination import PageNumberPagination
-import ujson as json
 from baseapp.datetime_ext import datetime_from_isodate
 from pictorlabs.serializers import (
     EntitySerializer,
@@ -24,6 +24,7 @@ from pictorlabs.models import (
     Feature,
     EntityFeature
 )
+from pictorlabs.tasks import ProcessVideoMgr, add_video_task
 
 
 class EntityViewSet(ModelViewSet):
@@ -65,4 +66,11 @@ class EntityViewSet(ModelViewSet):
     @detail_route(methods=['post'], url_path='set-test')
     def set_test_document(self, request, pk=None):
         return self.set_entity_document('test', request)
+
+
+@api_view(['POST'])
+def add_video(request):
+    mgr = ProcessVideoMgr(request.data['url'])
+    add_video_task.delay(mgr.url)
+    return Response({}, status=status.HTTP_201_CREATED)
 

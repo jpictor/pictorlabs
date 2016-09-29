@@ -242,7 +242,7 @@ else:
 
 ## exapand service name service name
 BROKER_URL = BROKER_URL.format(service_name=SERVICE_NAME)
-CELERY_RESULT_BACKEND = BROKER_URL
+CELERY_RESULT_BACKEND = None
 
 # serialization settings
 import anyjson

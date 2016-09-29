@@ -1,5 +1,3 @@
-import gc
-import time
 import os
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'baseapp.settings')
 from celery import Celery

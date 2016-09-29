@@ -98,27 +98,27 @@ case "$1" in
         exec ${PYTHON} "$@"
 	;;
     celery_dev)
-        exec celery \
-            -A baseapp.celery_ext.app worker \
+        exec celery worker \
+            --app=baseapp.celery_ext.app \
             --autoscale=4,0 \
-            --beat \
-            --workdir=${SERVICE_ROOT}/var \
             --maxtasksperchild=10 \
-            --loglevel=INFO \
+            --loglevel=DEBUG \
             --schedule=${SERVICE_ROOT}/var/celerybeat.db \
-	    --pidfile=${SERVICE_ROOT}/var/celerybeat.pid
+            --pidfile=${SERVICE_ROOT}/var/celerybeat.pid \
+            --beat
 	;;
     celery_q_default)
-        exec celery \
-            -A baseapp.celery_ext.app worker -Q baseapp \
+        exec celery worker \
+            --app=baseapp.celery_ext.app \
+            --queues=baseapp \
             --autoscale=2,0 \
             --maxtasksperchild=${MAX_TASKS_PER_CHILD} \
             --loglevel=${CELERY_LOGLEVEL} \
             ${CELERY_UID_ARGS}
         ;;
     celerybeat_prod)
-        exec celery \
-            beat -A baseapp.celery_ext.app \
+        exec celery beat \
+            --app=baseapp.celery_ext.app \
             --schedule=${SERVICE_ROOT}/var/celerybeat.db \
             --pidfile=${SERVICE_ROOT}/var/celerybeat.pid \
             --loglevel=${CELERY_LOGLEVEL} \

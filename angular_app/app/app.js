@@ -14,7 +14,8 @@ angular.module('myApp', [
     'wu.masonry',
     'infinite-scroll',
     'myApp.main',
-    'myApp.auth.login'
+    'myApp.auth.login',
+    'myApp.add_video'
 ])
 
     .factory('AuthInterceptor', function($q, $rootScope) {  
