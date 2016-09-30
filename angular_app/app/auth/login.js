@@ -9,7 +9,7 @@ angular.module('myApp.auth.login', ['ngRoute'])
         });
     }])
 
-    .controller('LoginCtrl', function ($scope, $rootScope, $location, Restangular) {
+    .controller('LoginCtrl', function ($scope, $window, $rootScope, $location, Restangular) {
         $scope.inputUsername = null;
         $scope.inputPassword = null;
         $scope.incorrectPassword = false;
@@ -18,7 +18,12 @@ angular.module('myApp.auth.login', ['ngRoute'])
             var postData = {username: $scope.inputUsername, password: $scope.inputPassword};
             Restangular.all('session/login').post(postData).then(function(chkResp) {
                 $rootScope.userIsAuthenticated = true;
-                $location.path('/app/');
+                var nextUrl = $location.search().next;
+                if (nextUrl) {
+                    $window.location = nextUrl;
+                } else {
+                    $location.path('/app/');
+                }
             }, function(response) {
                 $scope.incorrectPassword = true;
             });
