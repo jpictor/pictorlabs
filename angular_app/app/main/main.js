@@ -15,7 +15,7 @@ angular.module('myApp.main', ['ngRoute'])
 
     }])
 
-    .controller('MainCtrl', function ($scope, $window, $location, $routeParams, Restangular) {
+    .controller('MainCtrl', function ($scope, $window, $location, $routeParams, $sce, Restangular) {
         $scope.parentId = $routeParams.parentId;
         $scope.entity = null;
         $scope.typeFilter = 'all';
@@ -41,7 +41,7 @@ angular.module('myApp.main', ['ngRoute'])
             if ($scope.busy) return;
             $scope.loadItems(true);
         }
-
+        $scope.oembedHtml = '';
         $scope.setParentEntity = function(parentId) {
             $location.path('/fs/' + parentId);
         }
@@ -63,7 +63,7 @@ angular.module('myApp.main', ['ngRoute'])
             }
             var params = {
                 page: $scope.pageNum,
-                page_size: 10,
+                page_size: 30,
                 ordering: $scope.orderFilter
             };
             if ($scope.typeFilter != 'all') {
@@ -77,6 +77,7 @@ angular.module('myApp.main', ['ngRoute'])
             }
             Restangular.one('pictorlabs/entity/', $scope.parentId).get().then(function(entity) {
                 $scope.entity = entity;
+                $scope.oembedHtml = $sce.trustAsHtml(entity.doc.html);
             });
             Restangular.all('pictorlabs/entity/').getList(params).then(function(items) {
                 _.each(items, function(x) { $scope.items.push(x) }); 

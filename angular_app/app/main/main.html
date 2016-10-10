@@ -2,7 +2,9 @@
     <div class="row">
         <div class="main col-md-12">
 
-            <div class="col-md-12 col-sm-12"><h4 class="page-header">{{entity.title || 'Videos'}}<span class="pull-right">{{totalItemCount}} items</span></h4></div>
+            <div class="col-md-12 col-sm-12"><h4 class="">{{entity.title || 'Videos'}}<span class="pull-right">{{totalItemCount}} items</span></h4></div>
+            <div ng-if="entity.title" class="col-md-12 col-sm-12" style="margin-bottom:1em">{{entity.url}}</div>
+            <div class="col-md-12 col-sm-12"><span ng-bind-html-unsafe="oembedHtml"></span></div>
 
                 <div class="col-md-2 col-sm-4" ng-repeat="i in items">
                     <div class="panel panel-default" style="height:450px;overflow:hidden" ng-click="setParentEntity(i.id)">
@@ -10,7 +12,7 @@
                         <img ng-if="i.type == 'video'" style="width:100%;max-height:200px" class="img-responsive" ng-src="{{i.image_url}}">
                         <div class="panel-body">
                             <div class="row">
-                                <div class="col-md-12 h4">{{i.title}}</div>
+                                <div class="col-md-12 h6">{{i.title}}</div>
                                 <div ng-if="i.type == 'video'" ng-if="i.type == 'video'" class="col-md-12">Video</div>
                                 <div ng-if="i.type == 'video'" class="col-md-12"><span am-time-ago="i.created"></span></div>
                                 <div ng-if="i.type == 'image'" class="col-md-12">
@@ -22,8 +24,9 @@
                                     </div>
                                     <div ng-if="i.doc.faces">
                                         <h5>Faces</h5>
-                                        <div ng-repeat="label in i.doc.faces">
-                                            <small>x={{label[0]}} y={{label[1]}} w={{label[2]}} h={{label[3]}}</small>
+                                        <div ng-repeat="f in i.doc.faces">
+                                            <img style="width:30px" ng-src="{{f.image_url}}">
+                                            <small>x={{f.rect[0]}} y={{f.rect[1]}} w={{f.rect[2]}} h={{f.rect[3]}} gender={{f.gender}} age={{f.age}}</small>
                                         </div>
                                     </div>
                                 </div>
@@ -34,5 +37,6 @@
 
         </div>
     </div>
+
     <div infinite-scroll="loadItems(false)" infinite-scroll-distance="1"></div>
 </div>

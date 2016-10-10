@@ -290,7 +290,7 @@ CELERYBEAT_SCHEDULE = {
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': ('baseapp.permissions.InternalOrIsAuthenticated', ),
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': 10
+    'PAGE_SIZE': 30
 }
 
 
@@ -313,6 +313,7 @@ SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 
 ###### PICTORLABS CONFIG
 
+DATA_ROOT = os.path.join(SERVICE_ROOT, 'data')
 CAFFE_ROOT = '/home/jpaint/workspace/caffe'
 ENTITY_BASEURL = 'https://pictorlabs.com/entities'
 ENTITY_ROOT = '/disk/d0/data/entities/'
