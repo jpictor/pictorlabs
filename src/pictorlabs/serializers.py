@@ -22,6 +22,7 @@ class EntitySerializer(serializers.ModelSerializer):
     newspaper = serializers.SerializerMethodField()
     newspaper_timestamp = serializers.SerializerMethodField()
     topics = serializers.SerializerMethodField()
+    num_children = serializers.SerializerMethodField()
 
     def get_topics(self, obj):
         entity_features = obj.entity_features.filter(feature__feature_set__type='topic').order_by('-weight')
@@ -42,6 +43,9 @@ class EntitySerializer(serializers.ModelSerializer):
         if entity_features is None:
             return None
         return entity_features.timestamp
+
+    def get_num_children(self, obj):
+        return Entity.objects.filter(parent=obj.id).count()
 
 
 class EntityDocumentSerializer(serializers.ModelSerializer):

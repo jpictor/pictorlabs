@@ -3,11 +3,11 @@
         <div class="main col-md-12">
 
             <div class="col-md-12 col-sm-12"><h4 class="">{{entity.title || 'Videos'}}<span class="pull-right">{{totalItemCount}} items</span></h4></div>
-            <div ng-if="entity.title" class="col-md-12 col-sm-12" style="margin-bottom:1em">{{entity.url}}</div>
+            <div ng-if="entity.title" class="col-md-12 col-sm-12" style="margin-bottom:1em"><a href="{{entity.url}}">{{entity.url}}</a></div>
             <div class="col-md-12 col-sm-12"><span ng-bind-html-unsafe="oembedHtml"></span></div>
 
                 <div class="col-md-2 col-sm-4" ng-repeat="i in items">
-                    <div class="panel panel-default" style="height:450px;overflow:hidden" ng-click="setParentEntity(i.id)">
+                    <div class="panel panel-default" style="height:450px;overflow:hidden" ng-click="setParentEntity(i)">
                         <img ng-if="i.type == 'image'" style="width:100%;max-height:200px" class="img-responsive" ng-src="{{i.url}}">
                         <img ng-if="i.type == 'video'" style="width:100%;max-height:200px" class="img-responsive" ng-src="{{i.image_url}}">
                         <div class="panel-body">

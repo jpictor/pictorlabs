@@ -15,7 +15,8 @@ angular.module('myApp', [
     'infinite-scroll',
     'myApp.main',
     'myApp.auth.login',
-    'myApp.add_video'
+    'myApp.add_video',
+    'myApp.about'
 ])
 
     .factory('AuthInterceptor', function($q, $rootScope) {  
