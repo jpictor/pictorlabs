@@ -9,7 +9,7 @@ from rest_framework.parsers import JSONParser
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
-from rest_framework.decorators import detail_route
+from rest_framework.decorators import detail_route, permission_classes
 from rest_framework.response import Response
 from rest_framework.pagination import PageNumberPagination
 from baseapp.datetime_ext import datetime_from_isodate
@@ -69,8 +69,10 @@ class EntityViewSet(ModelViewSet):
 
 
 @api_view(['POST'])
+@permission_classes([AllowAny])
 def add_video(request):
     mgr = ProcessVideoMgr(request.data['url'])
+    mgr.run_get_youtube_video_info()
     add_video_task.delay(mgr.url)
     return Response({}, status=status.HTTP_201_CREATED)
 
