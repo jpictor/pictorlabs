@@ -8,7 +8,6 @@ boto
 celery
 certifi
 cffi
-couchbase
 cryptography
 Django
 django-filter

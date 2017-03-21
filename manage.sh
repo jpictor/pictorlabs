@@ -58,9 +58,7 @@ function build_vpython {
 
 ## build AngularJS app
 function build_angular_app {
-        pushd angular_app
-        bower install
-        popd
+        npm run bower-install
 }
 
 ## build static dir
@@ -100,7 +98,7 @@ case "$1" in
     celery_dev)
         exec celery worker \
             --app=baseapp.celery_ext.app \
-            --autoscale=4,0 \
+            --autoscale=1,0 \
             --maxtasksperchild=10 \
             --loglevel=DEBUG \
             --schedule=${SERVICE_ROOT}/var/celerybeat.db \

@@ -8,3 +8,5 @@
 !.pep8
 vpython
 static
+node_modules
+var/*

@@ -1,0 +1,9 @@
+{
+  "name": "pictorlabs",
+  "dependencies": {
+    "bower": "^1.8.0"
+  },
+  "scripts": {
+    "bower-install": "bower install"
+  }
+}
