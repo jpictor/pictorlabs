@@ -58,12 +58,19 @@ function build_vpython {
 
 ## build AngularJS app
 function build_angular_app {
+        rm -rf angular_app/app/bower_components
         npm run bower-install
 }
 
 ## build static dir
 function build_collectstatic {
+        rm -rf static
         ${SERVICE_ROOT}/manage.sh collectstatic --noinput
+}
+
+## invoke vpython
+function activate_vpython {
+        source $SERVICE_ROOT/vpython/bin/activate
 }
 
 case "$1" in
@@ -77,6 +84,12 @@ case "$1" in
         set -e
         build_vpython
         ;;
+    install_requirements)
+        set -e
+        activate_vpython
+        echo "Installing requirements.txt..."
+        pip install -r requirements.txt
+        ;;
     create_rabbitmq_account)
         rabbitmqctl add_user ${SERVICE_NAME}_user password
         rabbitmqctl add_vhost ${SERVICE_NAME}_vhost
@@ -86,16 +99,19 @@ case "$1" in
         rabbitmqctl set_permissions -p ${SERVICE_NAME}_testvhost ${SERVICE_NAME}_testuser ".*" ".*" ".*"
     ;;
     exec)
+        activate_vpython
         export DJANGO_SETTINGS_MODULE=baseapp.settings
         shift 1
         exec "$@"
 	;;
     python)
+        activate_vpython
         shift 1
         export DJANGO_SETTINGS_MODULE=baseapp.settings
         exec ${PYTHON} "$@"
 	;;
     celery_dev)
+        activate_vpython
         exec celery worker \
             --app=baseapp.celery_ext.app \
             --autoscale=1,0 \
@@ -106,6 +122,7 @@ case "$1" in
             --beat
 	;;
     celery_q_default)
+        activate_vpython
         exec celery worker \
             --app=baseapp.celery_ext.app \
             --queues=baseapp \
@@ -115,6 +132,7 @@ case "$1" in
             ${CELERY_UID_ARGS}
         ;;
     celerybeat_prod)
+        activate_vpython
         exec celery beat \
             --app=baseapp.celery_ext.app \
             --schedule=${SERVICE_ROOT}/var/celerybeat.db \
@@ -123,9 +141,11 @@ case "$1" in
             ${CELERY_UID_ARGS}
 	;;
     flower)
+        activate_vpython
         exec celery -A baseapp.celery_ext.app flower --loglevel=${CELERY_LOGLEVEL}
 	;;
     rungu_dev)
+        activate_vpython
         exec gunicorn \
                 --bind=0.0.0.0:${SERVICE_PORT} \
                 --workers=3 \
@@ -135,6 +155,7 @@ case "$1" in
                 baseapp.wsgi:application
 	;;
     rungu_prod)
+        activate_vpython
         exec gunicorn \
                 --bind=0.0.0.0:${SERVICE_PORT} \
                 --workers=${NUM_WORKERS} \
@@ -149,6 +170,7 @@ case "$1" in
                 baseapp.wsgi:application
         ;;
     *)
+        activate_vpython
         export DJANGO_SETTINGS_MODULE=baseapp.settings
         export SERVICE_PORT=${SERVICE_PORT}
         exec ${PYTHON} ${SERVICE_ROOT}/etc/run_django.py "$@"

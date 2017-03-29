@@ -4,10 +4,10 @@ import glob
 import numpy as np
 import requests
 from PIL import Image
-import caffe
+#import caffe
 import requests
-import skimage
-import cv2
+#import skimage
+#import cv2
 from cStringIO import StringIO
 from django.conf import settings
 from django.core.management.base import BaseCommand
@@ -127,7 +127,7 @@ class FaceGenderAgeImageModel(object):
 
     def image_labels(self, image):
         input_image = caffe.io.load_image(image)
-        prediction = self.classifier.predict([input_image]) 
+        prediction = self.classifier.predict([input_image])
         return self.class_labels[prediction[0].argmax()]
 
 
@@ -310,9 +310,7 @@ class ProcessVideoMgr(BaseCommand):
 @app.task(name='pictorlabs.add_video')
 def add_video_task(url):
     mgr = ProcessVideoMgr(url)
-    mgr.run_get_youtube_video_info()    
+    mgr.run_get_youtube_video_info()
     mgr.run_download_video()
     mgr.run_video_to_images()
     mgr.run_tag_video()
-
-

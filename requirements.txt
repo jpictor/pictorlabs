@@ -45,3 +45,6 @@ subprocess32
 tornado
 ujson
 urllib3
+Pillow
+dj-database-url
+pytube

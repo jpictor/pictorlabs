@@ -3,7 +3,6 @@ import os
 import sys
 import yaml
 
-
 ####################################################################
 ## a little reflection...  alter settings based on on how
 ## Django is being invoked
@@ -37,7 +36,6 @@ APPNAME = {
     'test': 'test'
 }[RUN_MODE]
 
-
 ####################################################################
 ## read and configure environment variables
 
@@ -45,6 +43,7 @@ TESTING = RUN_MODE == 'test'
 SERVICE_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
 SERVICE_PARENT_DIR = os.path.dirname(SERVICE_ROOT)
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'baseapp.settings')
+DEBUG = os.environ.get('DEBUG', False)
 
 ####################################################################
 ## pull version information from webstack root
@@ -55,51 +54,30 @@ except IOError:
     SERVICE_VERSION = '0.0'
 
 ####################################################################
-## load configuration file
+## load config
 
-DEVELOPMENT_SETTINGS_FILE = os.path.join(SERVICE_ROOT, 'settings', 'default.yaml')
-PRODUCTION_SETTINGS_FILE = DEVELOPMENT_SETTINGS_FILE
-
-def load_settings_file(path):
-    if not os.path.isfile(path):
-        raise Exception('settings file not found: {}'.format(path))
-    try:
-        settings = yaml.load(open(path, 'r'))
-    except (ValueError) as err:
-        raise Exception('configuration file invalid YAML {}: {}'.format(path, str(err)))
-    return settings
-
-CONFIG = load_settings_file(PRODUCTION_SETTINGS_FILE)
+DATA_ROOT = os.path.join(SERVICE_ROOT, 'data')
+LOG_LEVEL = os.environ.get('LOG_LEVEL', 'INFO').upper()
+CAFFE_ROOT = os.environ.get('CAFE_ROOT', '/home/jpaint/workspace/caffe')
+ENTITY_BASEURL = os.environ.get('ENTITY_BASEURL', 'https://pictorlabs.com/entities')
+ENTITY_ROOT = os.environ.get('ENTITY_ROOT', '/disk/d0/data/entities/')
+DATABASE_URL = os.environ.get('DATABASE_URL', 'postgres://postgres:password@10.0.0.152/pictorlabs')
+CELERY_BROKER_URL = os.environ.get('CELERY_BROKER_URL', 'amqp://{service_name}_user:password@localhost:5672/{service_name}_vhost')
 
 ####################################################################
+## database configuration
 
-TESTDBNAME = CONFIG['testdbname']
-DEBUG = CONFIG.get('debug', False)
-
-## set log level
-import logging
-LOG_LEVEL = CONFIG.get('log_level', 'INFO').upper()
-if TESTING:
-    LOG_LEVEL = 'CRITICAL'
-
-ADMINS = (
-    ('Jay Painter', 'jay.painter@gmail.com'),
-)
-
-MANAGERS = ADMINS
-
-
-###### database configuration
+import dj_database_url
+DATABASE_SETTIGS = dj_database_url.parse(DATABASE_URL)
 
 DATABASES = {
     'default': {
-        'ENGINE': CONFIG['dbengine'],
-        'NAME': CONFIG['dbname'].format(service_name=SERVICE_NAME),
-        'USER': CONFIG.get('dbuser'),
-        'PASSWORD': CONFIG.get('dbpass'),
-        'HOST': CONFIG.get('dbhost'),
-        'PORT': CONFIG.get('dbport'),
-        'TEST_NAME': CONFIG['testdbname'].format(service_name=SERVICE_NAME),
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': DATABASE_SETTIGS.get('NAME'),
+        'USER': DATABASE_SETTIGS.get('USER'),
+        'PASSWORD': DATABASE_SETTIGS.get('PASSWORD'),
+        'HOST': DATABASE_SETTIGS.get('HOST'),
+        'PORT': DATABASE_SETTIGS.get('PORT'),
         'HAS_HSTORE': False,
         'OPTIONS': {
             'sslmode': 'disable'
@@ -116,7 +94,7 @@ ALLOWED_HOSTS = ['*']
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
 # although not all choices may be available on all operating systems.
 # In a Windows environment this must be set to your system time zone.
-TIME_ZONE = CONFIG['time_zone']
+TIME_ZONE = 'UTC'
 
 # Language code for this installation. All choices can be found here:
 # http://www.i18nguy.com/unicode/language-identifiers.html
@@ -230,18 +208,8 @@ if DEBUG:
 
 
 ###### Celery async task queue settings
-
-if TESTING:
-    BROKER_URL = CONFIG.get(
-        'celery_broker_url_test',
-        'amqp://{service_name}_testuser:password@localhost:5672/{service_name}_testvhost')
-else:
-    BROKER_URL = CONFIG.get(
-        'celery_broker_url',
-        'amqp://{service_name}_user:password@localhost:5672/{service_name}_vhost')
-
 ## exapand service name service name
-BROKER_URL = BROKER_URL.format(service_name=SERVICE_NAME)
+BROKER_URL = CELERY_BROKER_URL.format(service_name=SERVICE_NAME)
 CELERY_RESULT_BACKEND = None
 
 # serialization settings
@@ -309,12 +277,3 @@ SESSION_COOKIE_NAME = 'plsessionid'
 #SESSION_COOKIE_PATH = '/'
 #SESSION_COOKIE_SECURE = False
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
-
-
-###### PICTORLABS CONFIG
-
-DATA_ROOT = os.path.join(SERVICE_ROOT, 'data')
-CAFFE_ROOT = '/home/jpaint/workspace/caffe'
-ENTITY_BASEURL = 'https://pictorlabs.com/entities'
-ENTITY_ROOT = '/disk/d0/data/entities/'
-

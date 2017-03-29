@@ -18,6 +18,7 @@ class GroupSerializer(serializers.HyperlinkedModelSerializer):
 class EntitySerializer(serializers.ModelSerializer):
     class Meta:
         model = Entity
+        fields = '__all__'
 
     newspaper = serializers.SerializerMethodField()
     newspaper_timestamp = serializers.SerializerMethodField()
@@ -51,4 +52,4 @@ class EntitySerializer(serializers.ModelSerializer):
 class EntityDocumentSerializer(serializers.ModelSerializer):
     class Meta:
         model = EntityDocument
-
+        fields = '__all__'
